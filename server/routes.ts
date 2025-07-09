@@ -183,12 +183,12 @@ function mockAnalyzeImage(filename: string) {
   const mockItems = [
     { name: "MacBook Pro", category: "Electronics", value: 280000, confidence: 92 },
     { name: "iPhone", category: "Electronics", value: 120000, confidence: 95 },
-    { name: "Camera", category: "Electronics", value: 45000, confidence: 88 },
-    { name: "Watch", category: "Jewelry", value: 150000, confidence: 90 },
-    { name: "Office Chair", category: "Furniture", value: 80000, confidence: 85 },
-    { name: "Handbag", category: "Fashion", value: 35000, confidence: 87 },
-    { name: "Bicycle", category: "Sports", value: 65000, confidence: 89 },
-    { name: "Gaming Console", category: "Electronics", value: 55000, confidence: 93 }
+    { name: "デジタルカメラ", category: "Electronics", value: 45000, confidence: 88 },
+    { name: "腕時計", category: "Jewelry", value: 150000, confidence: 90 },
+    { name: "オフィスチェア", category: "Furniture", value: 80000, confidence: 85 },
+    { name: "ハンドバッグ", category: "Fashion", value: 35000, confidence: 87 },
+    { name: "自転車", category: "Sports", value: 65000, confidence: 89 },
+    { name: "ゲーム機", category: "Electronics", value: 55000, confidence: 93 }
   ];
 
   // Simple mock logic based on filename

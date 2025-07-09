@@ -25,6 +25,18 @@ export default function AssetCard({ asset, onClick }: AssetCardProps) {
     }
   };
 
+  const getCategoryJapanese = (category: string) => {
+    switch (category) {
+      case "Electronics": return "電子機器";
+      case "Furniture": return "家具";
+      case "Jewelry": return "ジュエリー";
+      case "Fashion": return "ファッション";
+      case "Sports": return "スポーツ";
+      case "Other": return "その他";
+      default: return category;
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -49,11 +61,11 @@ export default function AssetCard({ asset, onClick }: AssetCardProps) {
           <MoreVertical className="w-4 h-4 text-gray-400 flex-shrink-0" />
         </div>
         <p className="text-2xl font-bold text-material-green mb-2">
-          ${asset.estimatedValue.toLocaleString()}
+          ¥{asset.estimatedValue.toLocaleString()}
         </p>
         <div className="flex items-center justify-between">
           <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(asset.category)}`}>
-            {asset.category}
+            {getCategoryJapanese(asset.category)}
           </span>
           <span className="text-xs text-gray-500">
             {formatDate(asset.createdAt)}

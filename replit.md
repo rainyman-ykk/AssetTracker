@@ -99,7 +99,9 @@ The application follows a modern full-stack architecture with clear separation b
 
 ## Changelog
 - July 02, 2025. Initial setup
+- July 09, 2025. Localized application interface to Japanese
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Preferred language: Japanese (app interface translated to Japanese)

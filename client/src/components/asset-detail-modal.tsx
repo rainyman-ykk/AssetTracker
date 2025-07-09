@@ -36,15 +36,15 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
       queryClient.invalidateQueries({ queryKey: ['/api/assets'] });
       queryClient.invalidateQueries({ queryKey: ['/api/assets/stats/summary'] });
       toast({
-        title: "Asset Updated",
-        description: "Your asset has been successfully updated.",
+        title: "商品が更新されました",
+        description: "商品の更新が完了しました。",
       });
       onClose();
     },
     onError: () => {
       toast({
-        title: "Update Failed",
-        description: "Failed to update the asset. Please try again.",
+        title: "更新に失敗しました",
+        description: "商品の更新に失敗しました。再度お試しください。",
         variant: "destructive",
       });
     }
@@ -58,15 +58,15 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
       queryClient.invalidateQueries({ queryKey: ['/api/assets'] });
       queryClient.invalidateQueries({ queryKey: ['/api/assets/stats/summary'] });
       toast({
-        title: "Asset Deleted",
-        description: "Your asset has been successfully deleted.",
+        title: "商品が削除されました",
+        description: "商品の削除が完了しました。",
       });
       onClose();
     },
     onError: () => {
       toast({
-        title: "Delete Failed",
-        description: "Failed to delete the asset. Please try again.",
+        title: "削除に失敗しました",
+        description: "商品の削除に失敗しました。再度お試しください。",
         variant: "destructive",
       });
     }
@@ -77,7 +77,7 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
   };
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this asset? This action cannot be undone.")) {
+    if (window.confirm("この商品を削除してもよろしいですか？この操作は取り消せません。")) {
       deleteAssetMutation.mutate();
     }
   };
@@ -87,7 +87,7 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
       <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-medium text-gray-900">Asset Details</h2>
+            <h2 className="text-2xl font-medium text-gray-900">商品詳細</h2>
             <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="w-5 h-5" />
             </Button>
@@ -104,7 +104,7 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name">Item Name</Label>
+                <Label htmlFor="name">商品名</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -113,7 +113,7 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
               </div>
 
               <div>
-                <Label htmlFor="value">Estimated Value ($)</Label>
+                <Label htmlFor="value">推定価値 (円)</Label>
                 <Input
                   id="value"
                   type="number"
@@ -123,7 +123,7 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
               </div>
 
               <div>
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">カテゴリ</Label>
                 <Select
                   value={formData.category}
                   onValueChange={(value) => setFormData({...formData, category: value})}
@@ -132,18 +132,18 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Electronics">Electronics</SelectItem>
-                    <SelectItem value="Furniture">Furniture</SelectItem>
-                    <SelectItem value="Jewelry">Jewelry</SelectItem>
-                    <SelectItem value="Fashion">Fashion</SelectItem>
-                    <SelectItem value="Sports">Sports</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="Electronics">電子機器</SelectItem>
+                    <SelectItem value="Furniture">家具</SelectItem>
+                    <SelectItem value="Jewelry">ジュエリー</SelectItem>
+                    <SelectItem value="Fashion">ファッション</SelectItem>
+                    <SelectItem value="Sports">スポーツ</SelectItem>
+                    <SelectItem value="Other">その他</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="purchaseDate">Purchase Date</Label>
+                <Label htmlFor="purchaseDate">購入日</Label>
                 <Input
                   id="purchaseDate"
                   type="date"
@@ -153,13 +153,13 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
               </div>
 
               <div>
-                <Label htmlFor="notes">Notes</Label>
+                <Label htmlFor="notes">備考</Label>
                 <Textarea
                   id="notes"
                   rows={3}
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  placeholder="Add any notes about the item..."
+                  placeholder="商品に関する備考を追加..."
                 />
               </div>
             </div>
@@ -173,19 +173,19 @@ export default function AssetDetailModal({ asset, onClose }: AssetDetailModalPro
               className="flex items-center space-x-2"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Delete</span>
+              <span>削除</span>
             </Button>
 
             <div className="flex space-x-3">
               <Button variant="outline" onClick={onClose}>
-                Cancel
+                キャンセル
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={updateAssetMutation.isPending}
                 className="bg-material-blue hover:bg-material-blue-dark"
               >
-                Save Changes
+                変更を保存
               </Button>
             </div>
           </div>

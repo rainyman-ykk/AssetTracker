@@ -36,13 +36,13 @@ export default function AssetRegistry({
   return (
     <section>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-medium text-gray-900">Registered Items</h2>
+        <h2 className="text-2xl font-medium text-gray-900">登録済み商品</h2>
         <div className="flex items-center space-x-3">
           {/* Search Input (Desktop) */}
           <div className="hidden md:block">
             <Input
               type="text"
-              placeholder="Search items..."
+              placeholder="商品を検索..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-64"
@@ -52,30 +52,30 @@ export default function AssetRegistry({
           {/* Category Filter */}
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="All Categories" />
+              <SelectValue placeholder="すべてのカテゴリ" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="Electronics">Electronics</SelectItem>
-              <SelectItem value="Furniture">Furniture</SelectItem>
-              <SelectItem value="Jewelry">Jewelry</SelectItem>
-              <SelectItem value="Fashion">Fashion</SelectItem>
-              <SelectItem value="Sports">Sports</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
+              <SelectItem value="all">すべてのカテゴリ</SelectItem>
+              <SelectItem value="Electronics">電子機器</SelectItem>
+              <SelectItem value="Furniture">家具</SelectItem>
+              <SelectItem value="Jewelry">ジュエリー</SelectItem>
+              <SelectItem value="Fashion">ファッション</SelectItem>
+              <SelectItem value="Sports">スポーツ</SelectItem>
+              <SelectItem value="Other">その他</SelectItem>
             </SelectContent>
           </Select>
 
           {/* Sort Options */}
           <Select value={sortOption} onValueChange={setSortOption}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder="並び替え" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="value-high">Value (High to Low)</SelectItem>
-              <SelectItem value="value-low">Value (Low to High)</SelectItem>
-              <SelectItem value="date-new">Date (Newest First)</SelectItem>
-              <SelectItem value="date-old">Date (Oldest First)</SelectItem>
-              <SelectItem value="name">Name (A-Z)</SelectItem>
+              <SelectItem value="value-high">価値 (高い順)</SelectItem>
+              <SelectItem value="value-low">価値 (安い順)</SelectItem>
+              <SelectItem value="date-new">日付 (新しい順)</SelectItem>
+              <SelectItem value="date-old">日付 (古い順)</SelectItem>
+              <SelectItem value="name">名前 (あいうえお順)</SelectItem>
             </SelectContent>
           </Select>
 
@@ -105,7 +105,7 @@ export default function AssetRegistry({
       <div className="md:hidden mb-4">
         <Input
           type="text"
-          placeholder="Search items..."
+          placeholder="商品を検索..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -133,11 +133,11 @@ export default function AssetRegistry({
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Grid className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No items found</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">商品が見つかりません</h3>
           <p className="text-gray-600">
             {searchQuery || selectedCategory !== "all"
-              ? "Try adjusting your search or filter criteria."
-              : "Start by uploading a photo of your first item."}
+              ? "検索条件やフィルターを調整してください。"
+              : "最初の商品の写真をアップロードしてください。"}
           </p>
         </div>
       ) : (
@@ -159,7 +159,7 @@ export default function AssetRegistry({
       {assets.length > 0 && assets.length % 12 === 0 && (
         <div className="text-center mt-8">
           <Button variant="outline" className="flex items-center space-x-2">
-            <span>Load More</span>
+            <span>さらに読み込む</span>
             <ChevronDown className="w-4 h-4" />
           </Button>
         </div>

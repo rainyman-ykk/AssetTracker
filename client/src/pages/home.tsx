@@ -46,16 +46,16 @@ export default function Home() {
               <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
                 <div className="w-4 h-4 bg-white rounded-sm"></div>
               </div>
-              <h1 className="text-xl font-medium">AssetTracker</h1>
+              <h1 className="text-xl font-medium">資産管理</h1>
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                 <Search className="w-4 h-4 mr-2" />
-                Search
+                検索
               </Button>
               <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                 <Filter className="w-4 h-4 mr-2" />
-                Filter
+                フィルター
               </Button>
             </div>
             <Button variant="ghost" size="sm" className="md:hidden text-white">
@@ -70,7 +70,7 @@ export default function Home() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 w-4 h-4" />
             <Input
               type="text"
-              placeholder="Search items..."
+              placeholder="商品を検索..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/70 focus:ring-white/30"

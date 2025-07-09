@@ -42,31 +42,31 @@ export default function SummaryStats() {
     <section className="mt-12">
       <Card>
         <CardContent className="p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">Asset Summary</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-6">資産サマリー</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-material-blue mb-1">
                 {stats.totalItems}
               </div>
-              <div className="text-sm text-gray-600">Total Items</div>
+              <div className="text-sm text-gray-600">総商品数</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-material-green mb-1">
-                ${stats.totalValue.toLocaleString()}
+                ¥{stats.totalValue.toLocaleString()}
               </div>
-              <div className="text-sm text-gray-600">Total Value</div>
+              <div className="text-sm text-gray-600">総価値</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-material-orange mb-1">
-                ${stats.avgValue.toLocaleString()}
+                ¥{stats.avgValue.toLocaleString()}
               </div>
-              <div className="text-sm text-gray-600">Average Value</div>
+              <div className="text-sm text-gray-600">平均価値</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-material-teal mb-1">
                 {stats.categories}
               </div>
-              <div className="text-sm text-gray-600">Categories</div>
+              <div className="text-sm text-gray-600">カテゴリ数</div>
             </div>
           </div>
         </CardContent>

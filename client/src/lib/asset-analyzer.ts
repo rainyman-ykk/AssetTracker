@@ -11,12 +11,12 @@ export interface AnalysisResult {
 const mockDatabase = [
   { keywords: ['macbook', 'laptop', 'apple'], name: 'MacBook Pro', category: 'Electronics', value: 280000, confidence: 92 },
   { keywords: ['iphone', 'phone', 'mobile'], name: 'iPhone', category: 'Electronics', value: 120000, confidence: 95 },
-  { keywords: ['camera', 'canon', 'nikon'], name: 'Digital Camera', category: 'Electronics', value: 45000, confidence: 88 },
-  { keywords: ['watch', 'rolex', 'timepiece'], name: 'Luxury Watch', category: 'Jewelry', value: 150000, confidence: 90 },
-  { keywords: ['chair', 'furniture', 'office'], name: 'Office Chair', category: 'Furniture', value: 80000, confidence: 85 },
-  { keywords: ['bag', 'handbag', 'purse'], name: 'Designer Handbag', category: 'Fashion', value: 35000, confidence: 87 },
-  { keywords: ['bike', 'bicycle', 'cycling'], name: 'Road Bicycle', category: 'Sports', value: 65000, confidence: 89 },
-  { keywords: ['console', 'gaming', 'playstation'], name: 'Gaming Console', category: 'Electronics', value: 55000, confidence: 93 }
+  { keywords: ['camera', 'canon', 'nikon'], name: 'デジタルカメラ', category: 'Electronics', value: 45000, confidence: 88 },
+  { keywords: ['watch', 'rolex', 'timepiece'], name: '腕時計', category: 'Jewelry', value: 150000, confidence: 90 },
+  { keywords: ['chair', 'furniture', 'office'], name: 'オフィスチェア', category: 'Furniture', value: 80000, confidence: 85 },
+  { keywords: ['bag', 'handbag', 'purse'], name: 'ハンドバッグ', category: 'Fashion', value: 35000, confidence: 87 },
+  { keywords: ['bike', 'bicycle', 'cycling'], name: '自転車', category: 'Sports', value: 65000, confidence: 89 },
+  { keywords: ['console', 'gaming', 'playstation'], name: 'ゲーム機', category: 'Electronics', value: 55000, confidence: 93 }
 ];
 
 export function analyzeImage(filename: string): AnalysisResult {
