@@ -56,9 +56,9 @@ The application follows a modern full-stack architecture with clear separation b
    - Click-to-edit functionality with modal interface
 
 3. **Data Persistence**:
-   - Current implementation uses in-memory storage
-   - Structured for easy migration to PostgreSQL
-   - Drizzle configuration ready for database deployment
+   - PostgreSQL database with Drizzle ORM
+   - Automatic schema migrations with `npm run db:push`
+   - Database storage implementation for persistent data
 
 ## External Dependencies
 
@@ -100,6 +100,7 @@ The application follows a modern full-stack architecture with clear separation b
 ## Changelog
 - July 02, 2025. Initial setup
 - July 09, 2025. Localized application interface to Japanese
+- July 12, 2025. Added PostgreSQL database with persistent data storage
 
 ## User Preferences
 
