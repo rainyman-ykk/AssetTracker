@@ -1,7 +1,5 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
-import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -37,8 +35,8 @@ export const updateAssetSchema = createInsertSchema(assets).omit({
   createdAt: true,
 }).partial();
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type InsertUser = Pick<typeof users.$inferInsert, 'username' | 'password'>;
 export type Asset = typeof assets.$inferSelect;
-export type InsertAsset = z.infer<typeof insertAssetSchema>;
-export type UpdateAsset = z.infer<typeof updateAssetSchema>;
+export type InsertAsset = Omit<typeof assets.$inferInsert, 'id' | 'createdAt'>;
+export type UpdateAsset = Partial<InsertAsset>;
