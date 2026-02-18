@@ -1,12 +1,14 @@
 import { users, assets, type User, type InsertUser, type Asset, type InsertAsset, type UpdateAsset } from "@shared/schema";
 import { db } from "./db";
-import { eq, or, ilike } from "drizzle-orm";
+import { eq, or, ilike, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+  getLlmCallCount(userId: number): Promise<number | undefined>;
+  incrementLlmCallCount(userId: number): Promise<void>;
+
   // Asset methods
   getAssets(): Promise<Asset[]>;
   getAsset(id: number): Promise<Asset | undefined>;
@@ -34,6 +36,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async getLlmCallCount(userId: number): Promise<number | undefined> {
+    const [user] = await db.select({ llmCallCount: users.llmCallCount }).from(users).where(eq(users.id, userId));
+    return user?.llmCallCount;
+  }
+
+  async incrementLlmCallCount(userId: number): Promise<void> {
+    await db.update(users).set({ llmCallCount: sql`${users.llmCallCount} + 1` }).where(eq(users.id, userId));
   }
 
   async getAssets(): Promise<Asset[]> {

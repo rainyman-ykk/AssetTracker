@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertAssetSchema, updateAssetSchema } from "@shared/schema";
 import multer from "multer";
 import { mockAnalyzeImage } from "./analyze";
+import { checkLlmLimit } from "./llm-limit";
 
 // Configure multer for memory storage
 const upload = multer({
@@ -82,6 +83,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload and analyze photo
   app.post("/api/assets/analyze", upload.single('image'), async (req: Request, res: Response) => {
     try {
+      // LLM呼び出し制限チェック
+      const userIdHeader = req.headers["x-user-id"];
+      if (userIdHeader) {
+        const userId = parseInt(userIdHeader as string, 10);
+        if (!isNaN(userId)) {
+          const limitResult = await checkLlmLimit(storage, userId);
+          if (!limitResult.allowed) {
+            res.status(429).json({ message: limitResult.reason });
+            return;
+          }
+        }
+      }
+
       const file = (req as any).file;
       if (!file) {
         res.status(400).json({ message: "No image file provided" });
@@ -94,6 +108,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Mock AI analysis - in production, this would call an actual AI service
       const mockAnalysis = mockAnalyzeImage(imageData);
+
+      // LLM呼び出し回数をインクリメント
+      if (userIdHeader) {
+        const userId = parseInt(userIdHeader as string, 10);
+        if (!isNaN(userId)) {
+          await storage.incrementLlmCallCount(userId);
+        }
+      }
 
       res.json({
         imageUrl,
