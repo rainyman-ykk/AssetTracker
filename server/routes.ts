@@ -1,16 +1,17 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAssetSchema, updateAssetSchema } from "@shared/schema";
 import multer from "multer";
+import { mockAnalyzeImage } from "./analyze";
 
 // Configure multer for memory storage
-const upload = multer({ 
+const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (_req: any, file: any, cb: any) => {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
@@ -21,10 +22,10 @@ const upload = multer({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all assets
-  app.get("/api/assets", async (req, res) => {
+  app.get("/api/assets", async (req: Request, res: Response) => {
     try {
       const { category, search, sort } = req.query;
-      
+
       let assets;
       if (search) {
         assets = await storage.searchAssets(search as string);
@@ -62,15 +63,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get asset by ID
-  app.get("/api/assets/:id", async (req, res) => {
+  app.get("/api/assets/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       const asset = await storage.getAsset(id);
-      
+
       if (!asset) {
-        return res.status(404).json({ message: "Asset not found" });
+        res.status(404).json({ message: "Asset not found" });
+        return;
       }
-      
+
       res.json(asset);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch asset" });
@@ -78,15 +80,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload and analyze photo
-  app.post("/api/assets/analyze", upload.single('image'), async (req, res) => {
+  app.post("/api/assets/analyze", upload.single('image'), async (req: Request, res: Response) => {
     try {
-      if (!req.file) {
-        return res.status(400).json({ message: "No image file provided" });
+      const file = (req as any).file;
+      if (!file) {
+        res.status(400).json({ message: "No image file provided" });
+        return;
       }
 
       // Convert buffer to base64
-      const imageData = req.file.buffer.toString('base64');
-      const imageUrl = `data:${req.file.mimetype};base64,${imageData}`;
+      const imageData = file.buffer.toString('base64');
+      const imageUrl = `data:${file.mimetype};base64,${imageData}`;
 
       // Mock AI analysis - in production, this would call an actual AI service
       const mockAnalysis = mockAnalyzeImage(imageData);
@@ -102,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create asset
-  app.post("/api/assets", async (req, res) => {
+  app.post("/api/assets", async (req: Request, res: Response) => {
     try {
       const validatedData = insertAssetSchema.parse(req.body);
       const asset = await storage.createAsset(validatedData);
@@ -117,16 +121,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update asset
-  app.put("/api/assets/:id", async (req, res) => {
+  app.put("/api/assets/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       const validatedData = updateAssetSchema.parse(req.body);
       const asset = await storage.updateAsset(id, validatedData);
-      
+
       if (!asset) {
-        return res.status(404).json({ message: "Asset not found" });
+        res.status(404).json({ message: "Asset not found" });
+        return;
       }
-      
+
       res.json(asset);
     } catch (error) {
       if (error instanceof Error) {
@@ -138,15 +143,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete asset
-  app.delete("/api/assets/:id", async (req, res) => {
+  app.delete("/api/assets/:id", async (req: Request, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       const deleted = await storage.deleteAsset(id);
-      
+
       if (!deleted) {
-        return res.status(404).json({ message: "Asset not found" });
+        res.status(404).json({ message: "Asset not found" });
+        return;
       }
-      
+
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete asset" });
@@ -154,10 +160,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get asset statistics
-  app.get("/api/assets/stats/summary", async (req, res) => {
+  app.get("/api/assets/stats/summary", async (_req: Request, res: Response) => {
     try {
       const assets = await storage.getAssets();
-      
+
       const totalItems = assets.length;
       const totalValue = assets.reduce((sum, asset) => sum + asset.estimatedValue, 0);
       const avgValue = totalItems > 0 ? Math.round(totalValue / totalItems) : 0;
@@ -176,48 +182,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
-}
-
-// Mock AI analysis function with consistent results
-function mockAnalyzeImage(imageData: string) {
-  const mockItems = [
-    { name: "MacBook Pro", category: "Electronics", value: 280000, confidence: 92 },
-    { name: "iPhone", category: "Electronics", value: 120000, confidence: 95 },
-    { name: "デジタルカメラ", category: "Electronics", value: 45000, confidence: 88 },
-    { name: "腕時計", category: "Jewelry", value: 150000, confidence: 90 },
-    { name: "オフィスチェア", category: "Furniture", value: 80000, confidence: 85 },
-    { name: "ハンドバッグ", category: "Fashion", value: 35000, confidence: 87 },
-    { name: "自転車", category: "Sports", value: 65000, confidence: 89 },
-    { name: "ゲーム機", category: "Electronics", value: 55000, confidence: 93 },
-    { name: "テーブル", category: "Furniture", value: 45000, confidence: 87 },
-    { name: "ノートパソコン", category: "Electronics", value: 180000, confidence: 91 },
-    { name: "スマートフォン", category: "Electronics", value: 95000, confidence: 94 },
-    { name: "ヘッドフォン", category: "Electronics", value: 25000, confidence: 89 },
-    { name: "バッグ", category: "Fashion", value: 28000, confidence: 86 },
-    { name: "靴", category: "Fashion", value: 18000, confidence: 88 },
-    { name: "本", category: "Other", value: 1500, confidence: 85 }
-  ];
-
-  // Create a simple hash from image data for consistent results
-  let hash = 0;
-  for (let i = 0; i < imageData.length; i++) {
-    const char = imageData.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  
-  // Use absolute hash value to select item consistently
-  const index = Math.abs(hash) % mockItems.length;
-  const selectedItem = mockItems[index];
-  
-  // Add small consistent variance based on hash
-  const variance = (Math.abs(hash) % 20000) - 10000;
-  const confidenceVariance = (Math.abs(hash) % 10) - 5;
-  
-  return {
-    name: selectedItem.name,
-    category: selectedItem.category,
-    estimatedValue: Math.max(1000, selectedItem.value + variance), // Ensure minimum value
-    confidence: Math.max(70, Math.min(100, selectedItem.confidence + confidenceVariance)) // Keep within 70-100 range
-  };
 }

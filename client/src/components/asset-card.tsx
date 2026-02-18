@@ -37,8 +37,8 @@ export default function AssetCard({ asset, onClick }: AssetCardProps) {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString();
   };
 
   return (
