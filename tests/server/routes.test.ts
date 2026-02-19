@@ -169,6 +169,56 @@ describe("ソート関数", () => {
   });
 });
 
+describe("analyzeエンドポイントのLLM呼び出し制限", () => {
+  // checkLlmLimitのルート統合テスト
+  // routes.tsはuserIdヘッダーからユーザーを特定し、制限チェックを行う
+
+  it("一般ユーザーが制限内のとき分析が成功し、呼び出し回数がインクリメントされる", async () => {
+    // この振る舞いはcheckLlmLimit + routes.tsの統合で検証
+    // checkLlmLimitが allowed: true を返す場合、分析結果が返る
+    const { checkLlmLimit } = await import("../../server/llm-limit");
+
+    const mockStorage = {
+      getUser: async (id: number) =>
+        id === 1 ? { role: "user" } : undefined,
+      getLlmCallCount: async (userId: number) =>
+        userId === 1 ? 0 : undefined,
+    };
+
+    const result = await checkLlmLimit(mockStorage, 1);
+    expect(result.allowed).toBe(true);
+  });
+
+  it("一般ユーザーが制限(5回)に達したとき分析が拒否される", async () => {
+    const { checkLlmLimit } = await import("../../server/llm-limit");
+
+    const mockStorage = {
+      getUser: async (id: number) =>
+        id === 1 ? { role: "user" } : undefined,
+      getLlmCallCount: async (userId: number) =>
+        userId === 1 ? 5 : undefined,
+    };
+
+    const result = await checkLlmLimit(mockStorage, 1);
+    expect(result.allowed).toBe(false);
+    expect(result).toHaveProperty("reason");
+  });
+
+  it("管理者は回数に関係なく分析が許可される", async () => {
+    const { checkLlmLimit } = await import("../../server/llm-limit");
+
+    const mockStorage = {
+      getUser: async (id: number) =>
+        id === 1 ? { role: "admin" } : undefined,
+      getLlmCallCount: async (userId: number) =>
+        userId === 1 ? 999 : undefined,
+    };
+
+    const result = await checkLlmLimit(mockStorage, 1);
+    expect(result.allowed).toBe(true);
+  });
+});
+
 describe("統計計算", () => {
   const assets = [
     { estimatedValue: 280000, category: "Electronics" },

@@ -112,6 +112,7 @@ describe("insertAssetSchema", () => {
   });
 });
 
+
 describe("updateAssetSchema", () => {
   it("部分的な更新データを受け入れる", () => {
     const partialUpdate = { name: "新しい名前" };

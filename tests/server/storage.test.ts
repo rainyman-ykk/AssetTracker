@@ -19,10 +19,26 @@ class InMemoryStorage {
   async createUser(user: InsertUser): Promise<User> {
     const newUser: User = {
       id: this.nextUserId++,
-      ...user,
+      username: user.username,
+      password: user.password,
+      role: "user",
+      llmCallCount: 0,
     };
     this.users.push(newUser);
     return newUser;
+  }
+
+  async getLlmCallCount(userId: number): Promise<number | undefined> {
+    const user = this.users.find((u) => u.id === userId);
+    if (!user) return undefined;
+    return user.llmCallCount;
+  }
+
+  async incrementLlmCallCount(userId: number): Promise<void> {
+    const user = this.users.find((u) => u.id === userId);
+    if (user) {
+      user.llmCallCount += 1;
+    }
   }
 
   async getAssets(): Promise<Asset[]> {
@@ -358,6 +374,60 @@ describe("Storage", () => {
     it("該当なしの場合は空配列を返す", async () => {
       const results = await storage.searchAssets("存在しない");
       expect(results).toHaveLength(0);
+    });
+  });
+
+  describe("ユーザーのroleとLLM呼び出し制限", () => {
+    it("作成したユーザーにデフォルトroleが設定される", async () => {
+      const user = await storage.createUser({
+        username: "testuser",
+        password: "password123",
+      });
+      expect(user.role).toBe("user");
+    });
+
+    it("作成したユーザーのllmCallCountが0である", async () => {
+      const user = await storage.createUser({
+        username: "testuser",
+        password: "password123",
+      });
+      expect(user.llmCallCount).toBe(0);
+    });
+
+    it("LLM呼び出し回数を取得できる", async () => {
+      const user = await storage.createUser({
+        username: "testuser",
+        password: "password123",
+      });
+      const count = await storage.getLlmCallCount(user.id);
+      expect(count).toBe(0);
+    });
+
+    it("LLM呼び出し回数をインクリメントできる", async () => {
+      const user = await storage.createUser({
+        username: "testuser",
+        password: "password123",
+      });
+      await storage.incrementLlmCallCount(user.id);
+      const count = await storage.getLlmCallCount(user.id);
+      expect(count).toBe(1);
+    });
+
+    it("LLM呼び出し回数を複数回インクリメントできる", async () => {
+      const user = await storage.createUser({
+        username: "testuser",
+        password: "password123",
+      });
+      await storage.incrementLlmCallCount(user.id);
+      await storage.incrementLlmCallCount(user.id);
+      await storage.incrementLlmCallCount(user.id);
+      const count = await storage.getLlmCallCount(user.id);
+      expect(count).toBe(3);
+    });
+
+    it("存在しないユーザーのLLM呼び出し回数取得はundefinedを返す", async () => {
+      const count = await storage.getLlmCallCount(999);
+      expect(count).toBeUndefined();
     });
   });
 
