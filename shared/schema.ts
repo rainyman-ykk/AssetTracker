@@ -6,7 +6,12 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   role: text("role").notNull().default("user"),
-  llmCallCount: integer("llm_call_count").notNull().default(0),
+});
+
+export const llmUsage = pgTable("llm_usage", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  callCount: integer("call_count").notNull().default(0),
 });
 
 export const assets = pgTable("assets", {
@@ -42,3 +47,4 @@ export type InsertUser = Pick<typeof users.$inferInsert, 'username' | 'password'
 export type Asset = typeof assets.$inferSelect;
 export type InsertAsset = Omit<typeof assets.$inferInsert, 'id' | 'createdAt'>;
 export type UpdateAsset = Partial<InsertAsset>;
+export type LlmUsage = typeof llmUsage.$inferSelect;

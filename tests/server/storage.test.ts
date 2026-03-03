@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Asset, InsertAsset, UpdateAsset, User, InsertUser } from "@shared/schema";
+import type { Asset, InsertAsset, UpdateAsset, User, InsertUser, LlmUsage } from "@shared/schema";
 
 // IStorage インターフェースに準拠したインメモリ実装でストレージロジックをテスト
 class InMemoryStorage {
   private users: User[] = [];
   private assets: Asset[] = [];
+  private llmUsageRecords: LlmUsage[] = [];
   private nextUserId = 1;
   private nextAssetId = 1;
+  private nextLlmUsageId = 1;
 
   async getUser(id: number): Promise<User | undefined> {
     return this.users.find((u) => u.id === id);
@@ -22,7 +24,6 @@ class InMemoryStorage {
       username: user.username,
       password: user.password,
       role: "user",
-      llmCallCount: 0,
     };
     this.users.push(newUser);
     return newUser;
@@ -31,14 +32,25 @@ class InMemoryStorage {
   async getLlmCallCount(userId: number): Promise<number | undefined> {
     const user = this.users.find((u) => u.id === userId);
     if (!user) return undefined;
-    return user.llmCallCount;
+    const record = this.llmUsageRecords.find((r) => r.userId === userId);
+    return record ? record.callCount : 0;
   }
 
   async incrementLlmCallCount(userId: number): Promise<void> {
-    const user = this.users.find((u) => u.id === userId);
-    if (user) {
-      user.llmCallCount += 1;
+    const record = this.llmUsageRecords.find((r) => r.userId === userId);
+    if (record) {
+      record.callCount += 1;
+    } else {
+      this.llmUsageRecords.push({
+        id: this.nextLlmUsageId++,
+        userId,
+        callCount: 1,
+      });
     }
+  }
+
+  async resetLlmUsage(): Promise<void> {
+    this.llmUsageRecords = [];
   }
 
   async getAssets(): Promise<Asset[]> {
@@ -386,14 +398,6 @@ describe("Storage", () => {
       expect(user.role).toBe("user");
     });
 
-    it("作成したユーザーのllmCallCountが0である", async () => {
-      const user = await storage.createUser({
-        username: "testuser",
-        password: "password123",
-      });
-      expect(user.llmCallCount).toBe(0);
-    });
-
     it("LLM呼び出し回数を取得できる", async () => {
       const user = await storage.createUser({
         username: "testuser",
@@ -428,6 +432,41 @@ describe("Storage", () => {
     it("存在しないユーザーのLLM呼び出し回数取得はundefinedを返す", async () => {
       const count = await storage.getLlmCallCount(999);
       expect(count).toBeUndefined();
+    });
+
+    it("resetLlmUsageで全ユーザーの呼び出し回数がリセットされる", async () => {
+      const user1 = await storage.createUser({
+        username: "user1",
+        password: "password123",
+      });
+      const user2 = await storage.createUser({
+        username: "user2",
+        password: "password123",
+      });
+      await storage.incrementLlmCallCount(user1.id);
+      await storage.incrementLlmCallCount(user1.id);
+      await storage.incrementLlmCallCount(user2.id);
+
+      await storage.resetLlmUsage();
+
+      const count1 = await storage.getLlmCallCount(user1.id);
+      const count2 = await storage.getLlmCallCount(user2.id);
+      expect(count1).toBe(0);
+      expect(count2).toBe(0);
+    });
+
+    it("resetLlmUsage後に再びインクリメントできる", async () => {
+      const user = await storage.createUser({
+        username: "testuser",
+        password: "password123",
+      });
+      await storage.incrementLlmCallCount(user.id);
+      await storage.incrementLlmCallCount(user.id);
+      await storage.resetLlmUsage();
+      await storage.incrementLlmCallCount(user.id);
+
+      const count = await storage.getLlmCallCount(user.id);
+      expect(count).toBe(1);
     });
   });
 

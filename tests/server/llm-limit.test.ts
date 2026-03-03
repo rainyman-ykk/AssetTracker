@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import type { User, InsertUser } from "@shared/schema";
+import type { User, InsertUser, LlmUsage } from "@shared/schema";
 import { checkLlmLimit } from "../../server/llm-limit";
 
 // InMemoryStorageの簡易版（LLM制限チェックに必要な部分のみ）
 class InMemoryStorage {
   private users: User[] = [];
+  private llmUsageRecords: LlmUsage[] = [];
   private nextUserId = 1;
+  private nextLlmUsageId = 1;
 
   async createUser(user: InsertUser & { role?: string }): Promise<User> {
     const newUser: User = {
@@ -13,7 +15,6 @@ class InMemoryStorage {
       username: user.username,
       password: user.password,
       role: user.role ?? "user",
-      llmCallCount: 0,
     };
     this.users.push(newUser);
     return newUser;
@@ -26,13 +27,20 @@ class InMemoryStorage {
   async getLlmCallCount(userId: number): Promise<number | undefined> {
     const user = this.users.find((u) => u.id === userId);
     if (!user) return undefined;
-    return user.llmCallCount;
+    const record = this.llmUsageRecords.find((r) => r.userId === userId);
+    return record ? record.callCount : 0;
   }
 
   async incrementLlmCallCount(userId: number): Promise<void> {
-    const user = this.users.find((u) => u.id === userId);
-    if (user) {
-      user.llmCallCount += 1;
+    const record = this.llmUsageRecords.find((r) => r.userId === userId);
+    if (record) {
+      record.callCount += 1;
+    } else {
+      this.llmUsageRecords.push({
+        id: this.nextLlmUsageId++,
+        userId,
+        callCount: 1,
+      });
     }
   }
 }

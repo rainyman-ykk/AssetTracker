@@ -1,4 +1,4 @@
-import { users, assets, type User, type InsertUser, type Asset, type InsertAsset, type UpdateAsset } from "@shared/schema";
+import { users, assets, llmUsage, type User, type InsertUser, type Asset, type InsertAsset, type UpdateAsset } from "@shared/schema";
 import { db } from "./db";
 import { eq, or, ilike, sql } from "drizzle-orm";
 
@@ -8,6 +8,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getLlmCallCount(userId: number): Promise<number | undefined>;
   incrementLlmCallCount(userId: number): Promise<void>;
+  resetLlmUsage(): Promise<void>;
 
   // Asset methods
   getAssets(): Promise<Asset[]>;
@@ -39,12 +40,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLlmCallCount(userId: number): Promise<number | undefined> {
-    const [user] = await db.select({ llmCallCount: users.llmCallCount }).from(users).where(eq(users.id, userId));
-    return user?.llmCallCount;
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) return undefined;
+    const [record] = await db.select({ callCount: llmUsage.callCount }).from(llmUsage).where(eq(llmUsage.userId, userId));
+    return record ? record.callCount : 0;
   }
 
   async incrementLlmCallCount(userId: number): Promise<void> {
-    await db.update(users).set({ llmCallCount: sql`${users.llmCallCount} + 1` }).where(eq(users.id, userId));
+    const [existing] = await db.select().from(llmUsage).where(eq(llmUsage.userId, userId));
+    if (existing) {
+      await db.update(llmUsage).set({ callCount: sql`${llmUsage.callCount} + 1` }).where(eq(llmUsage.userId, userId));
+    } else {
+      await db.insert(llmUsage).values({ userId, callCount: 1 });
+    }
+  }
+
+  async resetLlmUsage(): Promise<void> {
+    await db.delete(llmUsage);
   }
 
   async getAssets(): Promise<Asset[]> {

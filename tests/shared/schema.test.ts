@@ -3,7 +3,9 @@ import {
   insertUserSchema,
   insertAssetSchema,
   updateAssetSchema,
+  llmUsage,
 } from "@shared/schema";
+import type { LlmUsage } from "@shared/schema";
 
 describe("insertUserSchema", () => {
   it("有効なユーザーデータを受け入れる", () => {
@@ -112,6 +114,22 @@ describe("insertAssetSchema", () => {
   });
 });
 
+
+describe("llmUsageテーブル", () => {
+  it("llmUsageテーブルが定義されている", () => {
+    expect(llmUsage).toBeDefined();
+  });
+
+  it("LlmUsage型がuserIdとcallCountを持つ", () => {
+    const usage: LlmUsage = {
+      id: 1,
+      userId: 1,
+      callCount: 0,
+    };
+    expect(usage.userId).toBe(1);
+    expect(usage.callCount).toBe(0);
+  });
+});
 
 describe("updateAssetSchema", () => {
   it("部分的な更新データを受け入れる", () => {
